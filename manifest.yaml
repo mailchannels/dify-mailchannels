@@ -1,0 +1,30 @@
+version: 0.1.0
+type: plugin
+author: mailchannels
+name: mailchannels
+label:
+  en_US: MailChannels Email API
+description:
+  en_US: Send or validate transactional email through MailChannels.
+icon: icon.svg
+created_at: '2026-10-06T02:00:00Z'
+resource:
+  memory: 268435456
+  permission: {}
+plugins:
+  tools:
+  - provider/mailchannels.yaml
+meta:
+  version: 0.0.1
+  arch:
+  - amd64
+  - arm64
+  runner:
+    language: python
+    version: '3.12'
+    entrypoint: main
+privacy: PRIVACY.md
+network:
+  domains:
+  - api.mailchannels.net
+repo: https://github.com/mailchannels/dify-mailchannels

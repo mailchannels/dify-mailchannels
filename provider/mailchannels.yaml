@@ -1,0 +1,45 @@
+identity:
+  author: mailchannels
+  name: mailchannels
+  label:
+    en_US: MailChannels Email API
+  description:
+    en_US: Transactional email with provider-configured permissions.
+  icon: icon.svg
+  tags:
+  - productivity
+  - business
+credentials_for_provider:
+  api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: MailChannels API key
+  sender:
+    type: text-input
+    required: true
+    label:
+      en_US: Authorized sender address
+  allowed_recipients:
+    type: text-input
+    required: true
+    label:
+      en_US: Allowed recipient addresses, comma-separated
+  mode:
+    type: select
+    required: true
+    default: dry_run
+    label:
+      en_US: Mode (saving always performs a dry-run check)
+    options:
+    - value: dry_run
+      label:
+        en_US: Validate without sending
+    - value: send
+      label:
+        en_US: Send email
+tools:
+- tools/send_email.yaml
+extra:
+  python:
+    source: provider/mailchannels.py

@@ -1,0 +1,50 @@
+identity:
+  author: mailchannels
+  name: send_email
+  label:
+    en_US: Send or validate email
+description:
+  human:
+    en_US: Uses the configured sender, recipient permissions and mode.
+  llm: Send or validate a transactional email according to provider configuration.
+    Accepted does not mean delivered. Never automatically retry an unknown outcome.
+parameters:
+- name: to
+  type: string
+  required: true
+  label:
+    en_US: Recipient email address
+  human_description:
+    en_US: Recipient email address
+  llm_description: Recipient email address
+  form: llm
+- name: subject
+  type: string
+  required: true
+  label:
+    en_US: Subject
+  human_description:
+    en_US: Subject
+  llm_description: Subject
+  form: llm
+- name: text
+  type: string
+  required: true
+  label:
+    en_US: Plain-text body
+  human_description:
+    en_US: Plain-text body
+  llm_description: Plain-text body
+  form: llm
+- name: html
+  type: string
+  required: false
+  label:
+    en_US: Optional HTML body
+  human_description:
+    en_US: Optional HTML body
+  llm_description: Optional HTML body
+  form: llm
+extra:
+  python:
+    source: tools/send_email.py

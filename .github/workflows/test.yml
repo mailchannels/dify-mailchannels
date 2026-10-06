@@ -14,3 +14,14 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install -r requirements.txt pytest responses
       - run: python -m pytest -q
+      - name: Download verified packaging CLI
+        run: |
+          curl -fsSL https://github.com/langgenius/dify-plugin-daemon/releases/download/0.6.10/dify-plugin-linux-amd64 -o /tmp/dify
+          echo '0cef74bcae375a4337c2ff7d42e4787717981a795e1c23cf56bb27ec07ec8304  /tmp/dify' | sha256sum -c -
+          chmod +x /tmp/dify
+      - name: Package runtime files
+        run: PATH="/tmp:$PATH" python scripts/package.py --output /tmp/mailchannels.difypkg
+      - name: Build runtime test container
+        run: docker build -f tests/Dockerfile -t mailchannels-dify-runtime-test .
+      - name: Invoke packaged runtime with external networking disabled
+        run: docker run --rm --network none -v /tmp/mailchannels.difypkg:/package.difypkg:ro mailchannels-dify-runtime-test

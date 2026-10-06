@@ -15,3 +15,13 @@ Use Python 3.12; install requirements.txt plus pytest and responses, then run `p
 Source: https://github.com/mailchannels/dify-mailchannels
 
 With the official `dify` CLI on PATH, run `python scripts/package.py --output /tmp/mailchannels-0.1.0.difypkg`. The script stages only runtime files. The proposed `mailchannels` publisher namespace and support contact still need company confirmation; no Marketplace submission has occurred.
+
+The archive also has serverless-runtime protocol tests. They extract the package into a temporary directory, start its actual entrypoint and provider/tool registration, and call the Dify SDK HTTP runtime. Test-only HTTP interception supplies synthetic MailChannels responses. Run with external networking disabled:
+
+```sh
+python scripts/package.py --output /tmp/mailchannels.difypkg
+docker build -f tests/Dockerfile -t mailchannels-dify-runtime-test .
+docker run --rm --network none -v /tmp/mailchannels.difypkg:/package.difypkg:ro mailchannels-dify-runtime-test
+```
+
+These seven protocol scenarios cover credential validation, send/dry-run output, recipient restrictions, injected configuration rejection and uncertain outcomes. They do not test a Dify workspace's editor, daemon upload/installation, encrypted credential storage or Marketplace ownership. Those native acceptance steps remain open.

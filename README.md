@@ -1,6 +1,6 @@
 # MailChannels Email API for Dify
 
-A tool plugin for transactional email in workflows and agents. Native Dify installation testing and Marketplace review remain outstanding.
+A tool plugin for transactional email in workflows and agents. Installation, provider credentials and workflow execution have been tested on local Dify 1.17.1 with a synthetic HTTPS MailChannels mock. Browser/model-driven Agent checks, real provider validation and Marketplace review remain outstanding.
 
 Configure a MailChannels API key, authorized sender, comma-separated exact recipient allowlist (up to 100 addresses), and mode. Default mode validates without sending. Saving credentials always calls `/send?dry-run=true` with a synthetic message from/to the configured sender, even in send mode. This transmits the sender to MailChannels and checks the key and sender without requesting delivery.
 
@@ -25,3 +25,11 @@ docker run --rm --network none -v /tmp/mailchannels.difypkg:/package.difypkg:ro 
 ```
 
 These seven protocol scenarios cover credential validation, send/dry-run output, recipient restrictions, injected configuration rejection and uncertain outcomes. They do not test a Dify workspace's editor, daemon upload/installation, encrypted credential storage or Marketplace ownership. Those native acceptance steps remain open.
+
+## Disconnecting
+
+Remove each saved MailChannels credential from Dify's provider settings **before** uninstalling the plugin. On Dify 1.17.1, uninstalling the plugin alone left the tool credential record behind; its `preserve_credentials` option concerns model-provider credentials. Explicitly deleting the tool credential removed its stored record and prevented an existing workflow from making an API request. Uninstalling afterward removed the plugin without leaving tool credential records.
+
+If already uninstalled, the tested recovery is to reinstall the same trusted plugin, delete its saved credentials, then uninstall again. Review workflows referencing that credential: they will fail until deliberately reconfigured. Deleting Dify's saved credential does not revoke the API key at MailChannels. Revoke the dedicated key through MailChannels account management when it is no longer needed; do not revoke a shared key used by other applications.
+
+This lifecycle was tested with synthetic credentials against the native Dify workspace API and checked against the local credential table. It is not a guarantee for every Dify release or a substitute for your account's key-management policy.

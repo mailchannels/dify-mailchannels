@@ -1,6 +1,6 @@
 # MailChannels Email API for Dify
 
-A tool plugin for transactional email in workflows and agents. Installation, provider credentials and workflow execution have been tested on local Dify 1.17.1 with a synthetic HTTPS MailChannels mock. Browser/model-driven Agent checks, real provider validation and Marketplace review remain outstanding.
+A tool plugin for transactional email in workflows and agents. Installation, provider credentials and workflow execution have been tested on local Dify 1.17.1 with a synthetic HTTPS MailChannels mock. Editing and running an existing workflow through the browser also passed. From-scratch editor authoring, model-driven Agent and broader role/workspace checks, real provider validation and Marketplace review remain outstanding.
 
 Configure a MailChannels API key, authorized sender, comma-separated exact recipient allowlist (up to 100 addresses), and mode. Default mode validates without sending. Saving credentials always calls `/send?dry-run=true` with a synthetic message from/to the configured sender, even in send mode. This transmits the sender to MailChannels and checks the key and sender without requesting delivery.
 
@@ -14,7 +14,7 @@ Use Python 3.12; install requirements.txt plus pytest and responses, then run `p
 
 Source: https://github.com/mailchannels/dify-mailchannels
 
-With the official `dify` CLI on PATH, run `python scripts/package.py --output /tmp/mailchannels-0.1.0.difypkg`. The script stages only runtime files. The proposed `mailchannels` publisher namespace and support contact still need company confirmation; no Marketplace submission has occurred.
+With the official `dify` CLI on PATH, run `python scripts/package.py --output /tmp/mailchannels-0.1.1.difypkg`. The script stages only runtime files. Support contact: dev@mailchannels.com. The proposed `mailchannels` Marketplace publisher namespace still needs company registration/ownership; no Marketplace submission has occurred. The manifest declares Dify 1.17.1 as the oldest tested supported version. Older versions have not been validated.
 
 The archive also has serverless-runtime protocol tests. They extract the package into a temporary directory, start its actual entrypoint and provider/tool registration, and call the Dify SDK HTTP runtime. Test-only HTTP interception supplies synthetic MailChannels responses. Run with external networking disabled:
 
@@ -24,7 +24,7 @@ docker build -f tests/Dockerfile -t mailchannels-dify-runtime-test .
 docker run --rm --network none -v /tmp/mailchannels.difypkg:/package.difypkg:ro mailchannels-dify-runtime-test
 ```
 
-These seven protocol scenarios cover credential validation, send/dry-run output, recipient restrictions, injected configuration rejection and uncertain outcomes. They do not test a Dify workspace's editor, daemon upload/installation, encrypted credential storage or Marketplace ownership. Those native acceptance steps remain open.
+These seven protocol scenarios cover credential validation, send/dry-run output, recipient restrictions, injected configuration rejection and uncertain outcomes. They do not test a Dify workspace's editor, daemon upload/installation, encrypted credential storage or Marketplace ownership. Separate native installation/workflow/lifecycle checks are recorded in [validation scope](docs/NATIVE_VALIDATION.md); these protocol tests alone do not establish those results.
 
 ## Disconnecting
 
@@ -33,3 +33,13 @@ Remove each saved MailChannels credential from Dify's provider settings **before
 If already uninstalled, the tested recovery is to reinstall the same trusted plugin, delete its saved credentials, then uninstall again. Review workflows referencing that credential: they will fail until deliberately reconfigured. Deleting Dify's saved credential does not revoke the API key at MailChannels. Revoke the dedicated key through MailChannels account management when it is no longer needed; do not revoke a shared key used by other applications.
 
 This lifecycle was tested with synthetic credentials against the native Dify workspace API and checked against the local credential table. It is not a guarantee for every Dify release or a substitute for your account's key-management policy.
+
+Transport boundary in candidate 0.1.1: the plugin supplies its own SDK-compatible Requests transport, restricted to the fixed POST send endpoint with redirects disabled. A response is capped at 2 MiB locally; non-success bodies are discarded. The configured 30-second timeout applies to connection/read inactivity, not a strict wall-clock deadline. Streamed responses and enclosing workflow time limits still require deployment review. The exact 0.1.1 archive tested on local Dify 1.17.1 passed native installation/workflow/lifecycle acceptance; see [validation scope](docs/NATIVE_VALIDATION.md) for the source commit, archive hash and limits. Rebuild and revalidate the final reviewed archive before Marketplace submission.
+
+Native workspace-isolation follow-up used two independent owners/workspaces with
+this same 0.1.1 archive. Each could run its own workflow, while foreign workflow
+read/run and credential update/delete attempts were denied. A workflow referencing
+the other workspace's credential ID failed without a mock request, even when both
+workspaces had their own credentials. This is a specific owner/tenant boundary
+check, not full role, sharing, enterprise or Cloud isolation certification. See
+[validation scope](docs/NATIVE_VALIDATION.md).

@@ -6,6 +6,8 @@ The plugin adds no database, analytics, arbitrary URL retrieval or persistent me
 
 Output excludes rendered MIME, raw error bodies and headers; it can include request/message identifiers and summarized status. MailChannels processing/retention is governed by the service relationship: consult https://www.mailchannels.com/privacy-policy/ and your agreement. This plugin makes no additional retention guarantee.
 
-A monitored publisher support contact must be confirmed before submission.
+Support contact: dev@mailchannels.com.
 
 Credential removal: uninstalling a tool plugin does not necessarily delete its saved Dify credentials. On tested Dify 1.17.1, remove credentials explicitly in provider settings before uninstalling. See README.md for the verified sequence. This removes Dify's stored credential; it does not revoke the upstream MailChannels API key.
+
+Candidate 0.1.1 rejects redirects before forwarding credentials or content to another destination. Successful response bodies have a 2 MiB local cap; other response bodies are discarded.

@@ -35,7 +35,7 @@ harness, so this is not from-scratch visual authoring acceptance.
 
 ## Remaining acceptance
 
-Complete from-scratch editor authoring, model-driven Agent use, cross-workspace
+Complete from-scratch editor authoring, model-driven Agent use, broader role and workspace
 permissions, company deployment/timeout/retention controls and authorized provider
 validation. Agent repetition and manually rerun workflows can send duplicate mail;
 application authorization and reconciliation remain necessary. Company publisher
@@ -46,3 +46,24 @@ The repository's seven serverless protocol scenarios are a separate reproducible
 suite. They do not provision a native Dify installation or substitute for the
 native results above. The original native harness was tied to a disposable local
 Compose environment; a portable native fixture remains useful future work.
+
+## Two-workspace boundary check
+
+The same exact 0.1.1 archive was installed in two local workspaces with distinct
+owner accounts on Dify1.17.1. Native session-authenticated requests showed:
+
+- Workspace B initially listed no credentials from A. With B's own credential
+  configured, attempts to update or delete A's credential still failed.
+- Foreign workflow read and execution returned404; foreign credential update/delete
+  returned400. A workflow in B referencing A's credential ID failed before invoking
+  the mock, both before and after B had a valid credential of its own.
+- Both owners could invoke their own credential/workflow. Foreign attempts made
+  no mock requests and did not delete the other workspace's credential.
+- Reverse A-to-B workflow read/run and credential deletion were also denied.
+- Both saved credentials were explicitly deleted before uninstall. Execution after
+  deletion failed without a mock request. The database had zero remaining provider
+  credential rows; the fixture was stopped afterward.
+
+These are backend API checks with synthetic credentials and local HTTPS responses.
+They do not cover the browser's workspace switcher, every member role, credential
+sharing modes, shared app access, enterprise RBAC, Agent sessions or Dify Cloud.

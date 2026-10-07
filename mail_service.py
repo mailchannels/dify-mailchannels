@@ -1,9 +1,47 @@
 """Fixed-destination, bounded MailChannels SDK integration."""
 from typing import Any
 
-from mailchannels import Client, MailChannelsError, RequestsClient
+import json as json_module
+
+from mailchannels import Client, MailChannelsError
+from mailchannels.response import SDKResponse
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr
-from requests import RequestException
+from requests import RequestException, Session
+
+
+class FixedEndpointTransport:
+    """SDK transport restricted to one send endpoint with no redirects or retries."""
+    def __init__(self, *, timeout: float = 30.0) -> None:
+        self.timeout = timeout
+        self.session = Session()
+
+    def request(self, method: str, url: str, *, headers: dict[str, str],
+                json: dict[str, Any] | None = None,
+                params: dict[str, Any] | None = None) -> SDKResponse:
+        if method.upper() != "POST" or url != "https://api.mailchannels.net/tx/v1/send":
+            raise ValueError("Unexpected transport destination")
+        with self.session.request(method, url, headers=headers, json=json, params=params,
+                                  timeout=self.timeout, allow_redirects=False, stream=True) as response:
+            # Non-success payloads are unnecessary for this plugin's fixed outcome.
+            data = None
+            if response.status_code in (200, 202):
+                body = bytearray()
+                for chunk in response.iter_content(chunk_size=65536):
+                    body.extend(chunk)
+                    if len(body) > 2 * 1024 * 1024:
+                        raise ValueError("Response exceeds local bound")
+                try:
+                    data = json_module.loads(body)
+                except (ValueError, UnicodeError):
+                    pass
+            return SDKResponse(status_code=response.status_code, data=data,
+                               text="", headers=dict(response.headers))
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        self.session.close()
 
 
 class Settings(BaseModel):
@@ -49,7 +87,7 @@ def send(settings: Settings, message: Message, *, validation: bool = False) -> d
     payload = {"from": {"email": str(settings.sender)}, "subject": message.subject,
                "personalizations": [{"to": [{"email": str(message.to)}]}], "content": content}
     try:
-        with RequestsClient(timeout=30) as transport:
+        with FixedEndpointTransport(timeout=30) as transport:
             client = Client(api_key=settings.api_key.get_secret_value(),
                             base_url="https://api.mailchannels.net/tx/v1",
                             http_client=transport, strict_responses=True)

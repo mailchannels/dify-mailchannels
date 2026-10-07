@@ -107,3 +107,38 @@ def test_invalid_configuration(extra):
     with pytest.raises(ToolProviderCredentialValidationError):
         MailChannelsProvider().validate_credentials({**CREDS,**extra})
     assert not responses.calls
+
+@pytest.mark.parametrize('redirect_status',[302,307,308])
+@pytest.mark.parametrize('mode',['dry_run','send'])
+@responses.activate
+def test_redirect_never_forwards_credential_or_repeats_post(redirect_status,mode):
+    target='https://untrusted.example/collect'
+    responses.post(URL,status=redirect_status,headers={'Location':target})
+    for method in (responses.GET,responses.POST):
+        responses.add(method,target,json=sent() if mode=='send' else {'data':['mime']},status=202 if mode=='send' else 200)
+    result=invoke(mode=mode)
+    assert len(responses.calls)==1, 'redirect emitted another credential-bearing request'
+    assert result['status']=='unknown'
+
+@responses.activate
+def test_oversized_success_response_is_unknown_and_not_returned():
+    responses.post(URL,body='x'*(2*1024*1024+1),status=200)
+    result=invoke()
+    assert result['status']=='unknown'
+    assert len(responses.calls)==1
+    assert len(json.dumps(result))<500
+
+@responses.activate
+def test_malformed_success_response_is_unknown():
+    responses.post(URL,body='not json',status=200)
+    assert invoke()['status']=='unknown'
+    assert len(responses.calls)==1
+
+@pytest.mark.parametrize('method,url',[('GET',URL),('POST','https://untrusted.example/send')])
+@responses.activate
+def test_transport_refuses_alternate_method_or_destination(method,url):
+    from mail_service import FixedEndpointTransport
+    with FixedEndpointTransport() as transport:
+        with pytest.raises(ValueError):
+            transport.request(method,url,headers={'X-Api-Key':KEY})
+    assert len(responses.calls)==0

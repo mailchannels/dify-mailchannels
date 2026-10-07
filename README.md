@@ -14,7 +14,7 @@ Use Python 3.12; install requirements.txt plus pytest and responses, then run `p
 
 Source: https://github.com/mailchannels/dify-mailchannels
 
-With the official `dify` CLI on PATH, run `python scripts/package.py --output /tmp/mailchannels-0.1.0.difypkg`. The script stages only runtime files. The proposed `mailchannels` publisher namespace and support contact still need company confirmation; no Marketplace submission has occurred.
+With the official `dify` CLI on PATH, run `python scripts/package.py --output /tmp/mailchannels-0.1.1.difypkg`. The script stages only runtime files. Support contact: dev@mailchannels.com. The proposed `mailchannels` Marketplace publisher namespace still needs company registration/ownership; no Marketplace submission has occurred. The manifest declares Dify 1.17.1 as the oldest tested supported version. Older versions have not been validated.
 
 The archive also has serverless-runtime protocol tests. They extract the package into a temporary directory, start its actual entrypoint and provider/tool registration, and call the Dify SDK HTTP runtime. Test-only HTTP interception supplies synthetic MailChannels responses. Run with external networking disabled:
 
@@ -33,3 +33,5 @@ Remove each saved MailChannels credential from Dify's provider settings **before
 If already uninstalled, the tested recovery is to reinstall the same trusted plugin, delete its saved credentials, then uninstall again. Review workflows referencing that credential: they will fail until deliberately reconfigured. Deleting Dify's saved credential does not revoke the API key at MailChannels. Revoke the dedicated key through MailChannels account management when it is no longer needed; do not revoke a shared key used by other applications.
 
 This lifecycle was tested with synthetic credentials against the native Dify workspace API and checked against the local credential table. It is not a guarantee for every Dify release or a substitute for your account's key-management policy.
+
+Transport boundary in candidate 0.1.1: the plugin supplies its own SDK-compatible Requests transport, restricted to the fixed POST send endpoint with redirects disabled. A response is capped at 2 MiB locally; non-success bodies are discarded. The configured 30-second timeout applies to connection/read inactivity, not a strict wall-clock deadline. Streamed responses and enclosing workflow time limits still require deployment review. The earlier local Dify installation evidence covers 0.1.0; rerun native installation/workflow acceptance for 0.1.1 before Marketplace submission.

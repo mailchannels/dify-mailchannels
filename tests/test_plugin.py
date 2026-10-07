@@ -142,3 +142,12 @@ def test_transport_refuses_alternate_method_or_destination(method,url):
         with pytest.raises(ValueError):
             transport.request(method,url,headers={'X-Api-Key':KEY})
     assert len(responses.calls)==0
+
+@responses.activate
+def test_redirect_body_is_not_read_even_to_prepare_next_request(monkeypatch):
+    responses.post(URL,body='must not buffer a redirect body',status=307,headers={'Location':'https://untrusted.example/collect'})
+    def forbidden_read(*args,**kwargs):
+        raise AssertionError('redirect body consumed')
+    monkeypatch.setattr(requests.Response,'iter_content',forbidden_read)
+    assert invoke()['status']=='unknown'
+    assert len(responses.calls)==1

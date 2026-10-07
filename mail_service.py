@@ -9,11 +9,18 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr
 from requests import RequestException, Session
 
 
+class NoRedirectSession(Session):
+    def resolve_redirects(self, *args: Any, **kwargs: Any):
+        # Requests otherwise prepares Response.next even with allow_redirects=False,
+        # consuming the entire redirect body. This transport never follows redirects.
+        return iter(())
+
+
 class FixedEndpointTransport:
     """SDK transport restricted to one send endpoint with no redirects or retries."""
     def __init__(self, *, timeout: float = 30.0) -> None:
         self.timeout = timeout
-        self.session = Session()
+        self.session = NoRedirectSession()
 
     def request(self, method: str, url: str, *, headers: dict[str, str],
                 json: dict[str, Any] | None = None,

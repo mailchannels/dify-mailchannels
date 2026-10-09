@@ -67,3 +67,26 @@ owner accounts on Dify1.17.1. Native session-authenticated requests showed:
 These are backend API checks with synthetic credentials and local HTTPS responses.
 They do not cover the browser's workspace switcher, every member role, credential
 sharing modes, shared app access, enterprise RBAC, Agent sessions or Dify Cloud.
+
+## Local slow-response transport checks
+
+On October 9, 2026, the six cases in `tests/test_transport_timeout.py` exercised
+real Requests 2.34.2 and MailChannels SDK 1.5.0 sockets against an ephemeral
+loopback HTTP server. Delayed headers and interrupted success bodies returned
+`unknown` with the configured dry-run flag, `retry_safe=false` and one POST.
+Complete JSON trickled at 0.1-second intervals finished beyond the test's
+one-second inactivity timeout, returning `validated` or `accepted` with
+`delivery_confirmed=false` for send mode. The helper's requested 30-second timeout
+is asserted; only the test transport factory shortens it.
+
+The same suite ran against the safely extracted saved archive identified above;
+its runtime files matched source. Response closure was checked for body stalls
+and completed responses. Header expiry creates no response object, so that case
+checks session closure only. All cases close sockets and join the server and
+watchdog. An independent watchdog and a bounded subprocess prevent a missing
+timeout from hanging pytest.
+
+These local transport checks do not repeat native Dify validation or exercise
+DNS, TLS, connection-establishment stalls, Dify daemon/workflow deadlines or a
+strict wall-clock request limit. The saved archive was not rebuilt or changed.
+Deployment time limits, model-driven Agent use and publication gates remain open.

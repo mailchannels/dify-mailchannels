@@ -36,6 +36,15 @@ This lifecycle was tested with synthetic credentials against the native Dify wor
 
 Transport boundary in candidate 0.1.1: the plugin supplies its own SDK-compatible Requests transport, restricted to the fixed POST send endpoint with redirects disabled. A response is capped at 2 MiB locally; non-success bodies are discarded. The configured 30-second timeout applies to connection/read inactivity, not a strict wall-clock deadline. Streamed responses and enclosing workflow time limits still require deployment review. The exact 0.1.1 archive tested on local Dify 1.17.1 passed native installation/workflow/lifecycle acceptance; see [validation scope](docs/NATIVE_VALIDATION.md) for the source commit, archive hash and limits. Rebuild and revalidate the final reviewed archive before Marketplace submission.
 
+Run `python -m pytest -q -s tests/test_transport_timeout.py` for real local socket
+checks of delayed headers, stalled bodies and completed trickled JSON. The tests
+assert the helper requests 30 seconds, then shorten inactivity to one second only
+inside the test factory. Each case runs in a bounded fresh interpreter to avoid
+Dify's gevent patches, uses synthetic data and routes the guarded destination to
+an ephemeral loopback server. They check uncertain outcomes, one POST, output
+redaction and resource cleanup. Trickle completion beyond one second demonstrates
+inactivity semantics; it does not establish a strict request or workflow deadline.
+
 Native workspace-isolation follow-up used two independent owners/workspaces with
 this same 0.1.1 archive. Each could run its own workflow, while foreign workflow
 read/run and credential update/delete attempts were denied. A workflow referencing

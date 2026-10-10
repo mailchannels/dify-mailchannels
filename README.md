@@ -1,6 +1,6 @@
 # MailChannels Email API for Dify
 
-A tool plugin for transactional email in workflows and agents. Installation, provider credentials and workflow execution have been tested on local Dify 1.17.1 with a synthetic HTTPS MailChannels mock. Editing and running an existing workflow through the browser also passed. From-scratch editor authoring, model-driven Agent and broader role/workspace checks, real provider validation and Marketplace review remain outstanding.
+A tool plugin for transactional email in workflows and agents. Installation, provider credentials and workflow execution have been tested on local Dify 1.17.1 with a synthetic HTTPS MailChannels mock. Editing and running an existing workflow through the browser also passed. Native Community Edition role, credential visibility/use and workspace switching checks also passed. From-scratch editor authoring, model-driven Agent, Cloud/Enterprise permissions, real provider validation and Marketplace review remain outstanding.
 
 Configure a MailChannels API key, authorized sender, comma-separated exact recipient allowlist (up to 100 addresses), and mode. Default mode validates without sending. Saving credentials always calls `/send?dry-run=true` with a synthetic message from/to the configured sender, even in send mode. This transmits the sender to MailChannels and checks the key and sender without requesting delivery.
 
@@ -52,3 +52,7 @@ the other workspace's credential ID failed without a mock request, even when bot
 workspaces had their own credentials. This is a specific owner/tenant boundary
 check, not full role, sharing, enterprise or Cloud isolation certification. See
 [validation scope](docs/NATIVE_VALIDATION.md).
+
+Native role acceptance is opt-in and uses isolated local containers with synthetic HTTPS.
+See [the fixture instructions](tests/native_roles/README.md) for prerequisites and commands,
+and [native validation scope](docs/NATIVE_VALIDATION.md) for observed behavior and limits.

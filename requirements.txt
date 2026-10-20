@@ -1,3 +1,4 @@
 dify_plugin==0.10.2
 mailchannels==1.5.0
 pydantic[email]==2.13.5
+requests==2.34.2

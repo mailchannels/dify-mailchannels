@@ -801,6 +801,14 @@ print(json.dumps({'mock_ip': socket.gethostbyname('api.mailchannels.net'),
         if errors:
             self.report['status'] = 'failed'
 
+    def owned_containers(self):
+        return self.command(['docker', 'ps', '-aq', '--filter',
+                             'label=com.docker.compose.project=' + PROJECT]).split()
+
+    def owned(self, kind):
+        return self.command(['docker', kind, 'ls', '-q', '--filter',
+                             'name=^' + PROJECT + '_']).split()
+
     def teardown(self):
         if self.broker is not None:
             self.broker.terminate()
@@ -812,14 +820,12 @@ print(json.dumps({'mock_ip': socket.gethostbyname('api.mailchannels.net'),
             assert all(item['Name'] == '/' + PROJECT + '-wheels' and item['Config']['Labels'].get(
                 'native_roles_fixture') == PROJECT for item in wheel)
             self.command(['docker', 'rm', '-f', *wheels])
-        ids = self.command(['docker', 'ps', '-aq', '--filter',
-                            'label=com.docker.compose.project=' + PROJECT]).split()
+        ids = self.owned_containers()
         if ids:
             guarded(json.loads(self.command(['docker', 'inspect', *ids])))
         if self.created_project:
             for kind in ['volume', 'network']:
-                names = self.command(['docker', kind, 'ls', '-q', '--filter',
-                                      'name=^' + PROJECT + '_']).split()
+                names = self.owned(kind)
                 if names:
                     resources = json.loads(self.command(['docker', kind, 'inspect', *names]))
                     assert all(item['Labels'].get('native_roles_fixture') == PROJECT and
@@ -827,13 +833,9 @@ print(json.dumps({'mock_ip': socket.gethostbyname('api.mailchannels.net'),
                                for item in resources), 'Refusing unowned project storage/network'
             self.dc('logs', '--no-color', timeout=30, check=False)
             self.dc('down', '--volumes', '--remove-orphans', timeout=90)
-        residual = self.command(['docker', 'ps', '-aq', '--filter',
-                                 'label=com.docker.compose.project=' + PROJECT]).split()
-        assert residual == [], 'Owned containers remain'
+        assert self.owned_containers() == [], 'Owned containers remain'
         for kind in ['volume', 'network']:
-            assert not self.command(['docker', kind, 'ls', '-q', '--filter',
-                                     'name=^' + PROJECT + '_']).split(), (
-                'Owned ' + kind + ' remains')
+            assert not self.owned(kind), 'Owned ' + kind + ' remains'
         self.report['cleanup'].update(volumes_absent=True, networks_absent=True)
         current = self.inventory()
         current_by_id = {item['id']: item for item in current}
@@ -846,13 +848,9 @@ print(json.dumps({'mock_ip': socket.gethostbyname('api.mailchannels.net'),
 
     def execute(self):
         try:
-            existing = self.command(['docker', 'ps', '-aq', '--filter',
-                                     'label=com.docker.compose.project=' + PROJECT]).split()
-            assert not existing, 'Refusing to reuse an existing fixture project'
+            assert not self.owned_containers(), 'Refusing to reuse an existing fixture project'
             for kind in ['volume', 'network']:
-                assert not self.command(['docker', kind, 'ls', '-q', '--filter',
-                                         'name=^' + PROJECT + '_']).split(), (
-                    'Refusing to reuse existing fixture ' + kind)
+                assert not self.owned(kind), 'Refusing to reuse existing fixture ' + kind
             self.generate()
             image_info = json.loads(self.command(['docker', 'image', 'inspect', *IMAGES.values()]))
             assert all(item['Architecture'] == 'arm64' for item in image_info)

@@ -13,8 +13,9 @@ python tests/native_roles/run.py --archive /absolute/path/mailchannels-0.1.1.dif
 python tests/native_roles/run.py --archive /absolute/path/mailchannels-0.1.1.difypkg
 ```
 
-The archive must match SHA-256
-`276ba4fe72c81df1f3d68c79b6b79ffec7f4430c5df93cc2a255053373ab9f8d`.
+By default the archive must match SHA-256
+`276ba4fe72c81df1f3d68c79b6b79ffec7f4430c5df93cc2a255053373ab9f8d`; pass
+`--archive-sha256` with the recorded hash to revalidate a rebuilt archive.
 The fixture never rebuilds it. Pull the images named in `run.py` first; all other
 native services run on one internal Docker network without published ports.
 Docker Desktop does not publish ports from that network. The small stdio broker

@@ -95,14 +95,14 @@ class NativeSession(requests.Session):
 
 
 class Fixture:
-    def __init__(self, archive, controlled_failure=False):
-        assert sha(archive.read_bytes()) == ARCHIVE_SHA, 'Saved archive hash differs'
+    def __init__(self, archive, archive_sha256=ARCHIVE_SHA, controlled_failure=False):
+        assert sha(archive.read_bytes()) == archive_sha256, 'Saved archive hash differs'
         self.archive = archive
         self.controlled_failure = controlled_failure
         self.root = Path(tempfile.mkdtemp(prefix='dify-native-roles-01a122b4-'))
         self.secret_values = []
         self.source_hashes = {path.name: sha(path.read_bytes()) for path in HERE.glob('*.py')}
-        self.report = {'status': 'running', 'archive_sha256': ARCHIVE_SHA, 'images': IMAGES,
+        self.report = {'status': 'running', 'archive_sha256': archive_sha256, 'images': IMAGES,
                        'cases': [], 'cleanup': {}, 'limits': [
                            'CE backend APIs only; no browser, Cloud, '
                            'Enterprise RBAC or Agent checks',
@@ -955,6 +955,7 @@ def self_check():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--archive', type=Path)
+    parser.add_argument('--archive-sha256', default=ARCHIVE_SHA)
     parser.add_argument('--self-check', action='store_true')
     parser.add_argument('--fail-before-credentials', action='store_true')
     args = parser.parse_args()
@@ -964,5 +965,6 @@ if __name__ == '__main__':
     else:
         if not args.archive:
             parser.error('--archive is required')
-        status = Fixture(args.archive.resolve(), args.fail_before_credentials).execute()
+        status = Fixture(args.archive.resolve(), args.archive_sha256,
+                         args.fail_before_credentials).execute()
         raise SystemExit(0 if status in ['passed', 'controlled_failure_cleaned'] else 1)

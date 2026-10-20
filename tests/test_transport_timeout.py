@@ -194,6 +194,7 @@ def check_response(scenario, mode):
         else:
             assert outcome["status"] == "unknown" and outcome["retry_safe"] is False
         assert len(responses) == (0 if scenario == "headers" else 1)
+        assert errors if scenario != "trickle" else not errors
         assert all(response.closed_by_transport and response.raw.closed for response in responses)
         assert len(sessions) == 2 and all(session.closed for session in sessions)
     finally:

@@ -80,7 +80,7 @@ def check_response(scenario, mode):
                         return
                     self.wfile.write(chunk)
                     self.wfile.flush()
-            except (BrokenPipeError, ConnectionResetError, OSError):
+            except OSError:
                 # The watchdog may interrupt the handler while demonstrating a regression.
                 if not release.is_set():
                     raise

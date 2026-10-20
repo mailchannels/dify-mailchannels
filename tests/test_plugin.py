@@ -138,9 +138,8 @@ def test_malformed_success_response_is_unknown():
 @responses.activate
 def test_transport_refuses_alternate_method_or_destination(method,url):
     from mail_service import FixedEndpointTransport
-    with FixedEndpointTransport() as transport:
-        with pytest.raises(ValueError):
-            transport.request(method,url,headers={'X-Api-Key':KEY})
+    with pytest.raises(ValueError):
+        FixedEndpointTransport().request(method,url,headers={'X-Api-Key':KEY})
     assert len(responses.calls)==0
 
 @responses.activate

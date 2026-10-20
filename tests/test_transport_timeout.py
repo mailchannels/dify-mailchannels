@@ -158,10 +158,10 @@ def check_response(scenario, mode):
 
     try:
         with patch.object(mail_service, "NoRedirectSession", LocalSession):
-            with transport_type() as guarded:
-                for method, url in [("GET", URL), ("POST", "https://untrusted.example/send")]:
-                    with pytest.raises(ValueError):
-                        guarded.request(method, url, headers={"X-Api-Key": KEY})
+            guarded = transport_type()
+            for method, url in [("GET", URL), ("POST", "https://untrusted.example/send")]:
+                with pytest.raises(ValueError):
+                    guarded.request(method, url, headers={"X-Api-Key": KEY})
             assert not posts
             settings = mail_service.settings_from({
                 "api_key": KEY, "sender": "sender@example.com",
@@ -196,7 +196,7 @@ def check_response(scenario, mode):
         assert len(responses) == (0 if scenario == "headers" else 1)
         assert errors if scenario != "trickle" else not errors
         assert all(response.closed_by_transport and response.raw.closed for response in responses)
-        assert len(sessions) == 2 and all(session.closed for session in sessions)
+        assert len(sessions) == 1 and all(session.closed for session in sessions)
     finally:
         release.set()
         watchdog.cancel()

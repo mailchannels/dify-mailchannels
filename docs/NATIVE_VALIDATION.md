@@ -50,12 +50,12 @@ Compose environment; the opt-in fixture below replaces those unavailable local p
 ## Two-workspace boundary check
 
 The same exact 0.1.1 archive was installed in two local workspaces with distinct
-owner accounts on Dify1.17.1. Native session-authenticated requests showed:
+owner accounts on Dify 1.17.1. Native session-authenticated requests showed:
 
 - Workspace B initially listed no credentials from A. With B's own credential
   configured, attempts to update or delete A's credential still failed.
-- Foreign workflow read and execution returned404; foreign credential update/delete
-  returned400. A workflow in B referencing A's credential ID failed before invoking
+- Foreign workflow read and execution returned 404; foreign credential update/delete
+  returned 400. A workflow in B referencing A's credential ID failed before invoking
   the mock, both before and after B had a valid credential of its own.
 - Both owners could invoke their own credential/workflow. Foreign attempts made
   no mock requests and did not delete the other workspace's credential.

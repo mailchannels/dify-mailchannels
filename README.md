@@ -24,7 +24,7 @@ docker build -f tests/Dockerfile -t mailchannels-dify-runtime-test .
 docker run --rm --network none -v /tmp/mailchannels.difypkg:/package.difypkg:ro mailchannels-dify-runtime-test
 ```
 
-These seven protocol scenarios cover credential validation, send/dry-run output, recipient restrictions, injected configuration rejection and uncertain outcomes. They do not test a Dify workspace's editor, daemon upload/installation, encrypted credential storage or Marketplace ownership. Separate native installation/workflow/lifecycle checks are recorded in [validation scope](docs/NATIVE_VALIDATION.md); these protocol tests alone do not establish those results.
+These seven protocol scenarios cover credential validation, send/dry-run output, recipient restrictions, injected configuration rejection and uncertain outcomes. They do not test a Dify workspace's editor, daemon upload/installation, encrypted credential storage or Marketplace ownership. Separate native installation/workflow/lifecycle checks are recorded in [validation scope](https://github.com/mailchannels/dify-mailchannels/blob/main/docs/NATIVE_VALIDATION.md); these protocol tests alone do not establish those results.
 
 ## Disconnecting
 
@@ -34,7 +34,7 @@ If already uninstalled, the tested recovery is to reinstall the same trusted plu
 
 This lifecycle was tested with synthetic credentials against the native Dify workspace API and checked against the local credential table. It is not a guarantee for every Dify release or a substitute for your account's key-management policy.
 
-Transport boundary in candidate 0.1.1: the plugin supplies its own SDK-compatible Requests transport, restricted to the fixed POST send endpoint with redirects disabled. A response is capped at 2 MiB locally; non-success bodies are discarded. The configured 30-second timeout applies to connection/read inactivity, not a strict wall-clock deadline. Streamed responses and enclosing workflow time limits still require deployment review. The exact 0.1.1 archive tested on local Dify 1.17.1 passed native installation/workflow/lifecycle acceptance; see [validation scope](docs/NATIVE_VALIDATION.md) for the source commit, archive hash and limits. Rebuild and revalidate the final reviewed archive before Marketplace submission.
+Transport boundary in candidate 0.1.1: the plugin supplies its own SDK-compatible Requests transport, restricted to the fixed POST send endpoint with redirects disabled. A response is capped at 2 MiB locally; non-success bodies are discarded. The configured 30-second timeout applies to connection/read inactivity, not a strict wall-clock deadline. Streamed responses and enclosing workflow time limits still require deployment review. The exact 0.1.1 archive tested on local Dify 1.17.1 passed native installation/workflow/lifecycle acceptance; see [validation scope](https://github.com/mailchannels/dify-mailchannels/blob/main/docs/NATIVE_VALIDATION.md) for the source commit, archive hash and limits. Rebuild and revalidate the final reviewed archive before Marketplace submission.
 
 Run `python -m pytest -q -s tests/test_transport_timeout.py` for real local socket
 checks of delayed headers, stalled bodies and completed trickled JSON. The tests
@@ -51,8 +51,8 @@ read/run and credential update/delete attempts were denied. A workflow referenci
 the other workspace's credential ID failed without a mock request, even when both
 workspaces had their own credentials. This is a specific owner/tenant boundary
 check, not full role, sharing, enterprise or Cloud isolation certification. See
-[validation scope](docs/NATIVE_VALIDATION.md).
+[validation scope](https://github.com/mailchannels/dify-mailchannels/blob/main/docs/NATIVE_VALIDATION.md).
 
 Native role acceptance is opt-in and uses isolated local containers with synthetic HTTPS.
-See [the fixture instructions](tests/native_roles/README.md) for prerequisites and commands,
-and [native validation scope](docs/NATIVE_VALIDATION.md) for observed behavior and limits.
+See [the fixture instructions](https://github.com/mailchannels/dify-mailchannels/blob/main/tests/native_roles/README.md) for prerequisites and commands,
+and [native validation scope](https://github.com/mailchannels/dify-mailchannels/blob/main/docs/NATIVE_VALIDATION.md) for observed behavior and limits.

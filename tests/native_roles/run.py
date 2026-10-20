@@ -891,9 +891,9 @@ print(json.dumps({'mock_ip': socket.gethostbyname('api.mailchannels.net'),
                 self.report['status'] = 'failed'
                 self.report['cleanup']['error'] = self.redact(str(error))
             controlled = self.report.get('error') == 'Controlled precredential failure'
-            if self.controlled_failure and controlled:
-                assert self.report['cleanup'].get('containers_absent')
-                assert self.report['cleanup'].get('unrelated_baseline_preserved')
+            cleanup = self.report['cleanup']
+            if (self.controlled_failure and controlled and cleanup.get('containers_absent')
+                    and cleanup.get('unrelated_baseline_preserved')):
                 self.report['status'] = 'controlled_failure_cleaned'
             self.report['mock_requests'] = self.count()
             self.report['fixture_sources'] = self.source_hashes

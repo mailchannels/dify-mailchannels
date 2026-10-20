@@ -31,7 +31,7 @@ DNS/TLS and blocked external egress. After installation it checks default Reques
 TLS/proxy behavior in the actual plugin interpreter. It sends no real mail and
 uses no model provider, SMTP service, company account or Marketplace endpoint.
 
-Each run writes a private `/private/tmp/dify-native-roles-01a122b4-*` evidence
+Each run writes a private `$TMPDIR/dify-native-roles-01a122b4-*` evidence
 directory. `acceptance.json` contains sanitized results, artifact/image identities,
 wheel hashes and cleanup status; `log-hashes.json` identifies sanitized logs.
 Mock records contain only fixture labels, request status/mode and payload/routing

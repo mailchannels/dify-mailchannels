@@ -99,9 +99,7 @@ class Fixture:
         assert sha(archive.read_bytes()) == ARCHIVE_SHA, 'Saved archive hash differs'
         self.archive = archive
         self.controlled_failure = controlled_failure
-        self.root = Path(tempfile.mkdtemp(
-            prefix='dify-native-roles-01a122b4-', dir='/private/tmp'))
-        self.root.chmod(0o700)
+        self.root = Path(tempfile.mkdtemp(prefix='dify-native-roles-01a122b4-'))
         self.secret_values = []
         self.source_hashes = {path.name: sha(path.read_bytes()) for path in HERE.glob('*.py')}
         self.report = {'status': 'running', 'archive_sha256': ARCHIVE_SHA, 'images': IMAGES,
@@ -940,7 +938,7 @@ def self_check():
     instance = object.__new__(Fixture)
     instance.secret_values = ['synthetic-secret', 'session-value']
     assert instance.redact('synthetic-secret/session-value') == '[REDACTED]/[REDACTED]'
-    with tempfile.TemporaryDirectory(prefix='native-roles-self-check-', dir='/private/tmp') as name:
+    with tempfile.TemporaryDirectory(prefix='native-roles-self-check-') as name:
         path = Path(name) / 'private.json'
         instance.private_json(path, {'value': 'first'})
         instance.private_json(path, {'value': 'second'})

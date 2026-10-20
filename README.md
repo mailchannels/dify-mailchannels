@@ -34,12 +34,4 @@ If already uninstalled, the tested recovery is to reinstall the same trusted plu
 
 This lifecycle was tested with synthetic credentials against the native Dify workspace API and checked against the local credential table. It is not a guarantee for every Dify release or a substitute for your account's key-management policy.
 
-Transport boundary in candidate 0.1.1: the plugin supplies its own SDK-compatible Requests transport, restricted to the fixed POST send endpoint with redirects disabled. A response is capped at 2 MiB locally; non-success bodies are discarded. The configured 30-second timeout applies to connection/read inactivity, not a strict wall-clock deadline. Streamed responses and enclosing workflow time limits still require deployment review. The exact 0.1.1 archive tested on local Dify 1.17.1 passed native installation/workflow/lifecycle acceptance; see [validation scope](https://github.com/mailchannels/dify-mailchannels/blob/main/docs/NATIVE_VALIDATION.md) for the source commit, archive hash and limits. Rebuild and revalidate the final reviewed archive before Marketplace submission.
-
-Native workspace-isolation follow-up used two independent owners/workspaces with
-this same 0.1.1 archive. Each could run its own workflow, while foreign workflow
-read/run and credential update/delete attempts were denied. A workflow referencing
-the other workspace's credential ID failed without a mock request, even when both
-workspaces had their own credentials. This is a specific owner/tenant boundary
-check, not full role, sharing, enterprise or Cloud isolation certification. See
-[validation scope](https://github.com/mailchannels/dify-mailchannels/blob/main/docs/NATIVE_VALIDATION.md).
+Transport boundary in candidate 0.1.1: the plugin supplies its own SDK-compatible Requests transport, restricted to the fixed POST send endpoint with redirects disabled. A response is capped at 2 MiB locally; non-success bodies are discarded. The configured 30-second timeout applies to connection/read inactivity, not a strict wall-clock deadline. Streamed responses and enclosing workflow time limits still require deployment review. Native installation, workflow, lifecycle and workspace-isolation results, with their limits, are recorded in [validation scope](https://github.com/mailchannels/dify-mailchannels/blob/main/docs/NATIVE_VALIDATION.md).

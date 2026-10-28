@@ -53,6 +53,11 @@ def guarded(containers):
     return containers
 
 
+def wheels_name():
+    # Per-invocation name so a concurrent run cannot collide with or remove this downloader.
+    return PROJECT + '-wheels-' + secrets.token_hex(8)
+
+
 def sse(text):
     return [json.loads(line[5:].strip()) for line in text.splitlines() if line.startswith('data:')]
 
@@ -114,6 +119,7 @@ class Fixture:
         self.seed = None
         self.broker = None
         self.created_project = False
+        self.wheels_name = wheels_name()
         self.compose_path = self.root / 'compose.json'
         self.baseline = self.inventory()
         (self.root / 'baseline.json').write_text(stable(self.baseline))
@@ -283,7 +289,7 @@ class Fixture:
 
     def prepare_wheels(self):
         # Dependency fetch is separate and finishes before native credentials exist.
-        self.command(['docker', 'run', '--rm', '--name', PROJECT + '-wheels',
+        self.command(['docker', 'run', '--rm', '--name', self.wheels_name,
                       '--label', 'native_roles_fixture=' + PROJECT,
                       '-v', f'{self.root}/wheelhouse:/wheelhouse',
                       '-v', f'{HERE.parents[1]}/requirements.txt:/requirements.txt:ro',
@@ -813,10 +819,10 @@ print(json.dumps({'mock_ip': socket.gethostbyname('api.mailchannels.net'),
             self.broker.terminate()
             self.broker.wait(timeout=10)
         wheels = self.command(['docker', 'ps', '-aq', '--filter',
-                               'name=^/' + PROJECT + '-wheels$']).split()
+                               'name=^/' + self.wheels_name + '$']).split()
         if wheels:
             wheel = json.loads(self.command(['docker', 'inspect', *wheels]))
-            assert all(item['Name'] == '/' + PROJECT + '-wheels' and item['Config']['Labels'].get(
+            assert all(item['Name'] == '/' + self.wheels_name and item['Config']['Labels'].get(
                 'native_roles_fixture') == PROJECT for item in wheel)
             self.command(['docker', 'rm', '-f', *wheels])
         ids = self.owned_containers()
@@ -926,6 +932,8 @@ def self_check():
     valid = {'Config': {'Labels': {'com.docker.compose.project': PROJECT,
                                   'native_roles_fixture': PROJECT}}}
     assert guarded([valid]) == [valid]
+    first, second = wheels_name(), wheels_name()
+    assert first != second and re.fullmatch(re.escape(PROJECT) + r'-wheels-[0-9a-f]{16}', first)
     try:
         guarded([{'Config': {'Labels': {'com.docker.compose.project': 'unrelated'}}}])
     except AssertionError:

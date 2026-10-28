@@ -10,7 +10,6 @@ from pathlib import Path
 import secrets
 import selectors
 import shutil
-import socket
 import subprocess
 import tempfile
 import time

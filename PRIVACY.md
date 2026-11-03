@@ -6,7 +6,7 @@ The plugin adds no database, analytics, arbitrary URL retrieval or persistent me
 
 Output excludes rendered MIME, raw error bodies and headers; it can include request/message identifiers and summarized status. MailChannels processing/retention is governed by the service relationship: consult https://www.mailchannels.com/privacy-policy/ and your agreement. This plugin makes no additional retention guarantee.
 
-Support contact: dev@mailchannels.com.
+For project support, see the [Support section in the README](README.md#support). File project questions and issues there; MailChannels service problems belong at https://support.mailchannels.com/.
 
 Credential removal: uninstalling a tool plugin does not necessarily delete its saved Dify credentials. On tested Dify 1.17.1, remove credentials explicitly in provider settings before uninstalling. See README.md for the verified sequence. This removes Dify's stored credential; it does not revoke the upstream MailChannels API key.
 

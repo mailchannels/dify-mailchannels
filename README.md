@@ -14,7 +14,13 @@ Use Python 3.12; install requirements.txt plus pytest and responses, then run `p
 
 Source: https://github.com/mailchannels/dify-mailchannels
 
-With the official `dify` CLI on PATH, run `python scripts/package.py --output /tmp/mailchannels-0.1.1.difypkg`. The script stages only runtime files. Support contact: dev@mailchannels.com. The proposed `mailchannels` Marketplace publisher namespace still needs company registration/ownership; no Marketplace submission has occurred. The manifest declares Dify 1.17.1 as the oldest tested supported version. Older versions have not been validated.
+## Support
+
+This project is supported by the MailChannels team on a best-effort basis. The best way to get support is to file an issue on GitHub: https://github.com/mailchannels/dify-mailchannels/issues
+
+If you are a MailChannels customer and have a problem with the operation of the MailChannels service, you can get support at https://support.mailchannels.com/
+
+With the official `dify` CLI on PATH, run `python scripts/package.py --output /tmp/mailchannels-0.1.1.difypkg`. The script stages only runtime files. For project support, see the [Support](#support) section. The proposed `mailchannels` Marketplace publisher namespace still needs company registration/ownership; no Marketplace submission has occurred. The manifest declares Dify 1.17.1 as the oldest tested supported version. Older versions have not been validated.
 
 The archive also has serverless-runtime protocol tests. They extract the package into a temporary directory, start its actual entrypoint and provider/tool registration, and call the Dify SDK HTTP runtime. Test-only HTTP interception supplies synthetic MailChannels responses. Run with external networking disabled:
 

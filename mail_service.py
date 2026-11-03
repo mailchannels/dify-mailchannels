@@ -18,6 +18,9 @@ class NoRedirectSession(Session):
 
 class FixedEndpointTransport:
     """SDK transport restricted to one send endpoint with no redirects or retries."""
+    def __init__(self, *, timeout: float = 30.0) -> None:
+        self.timeout = timeout
+
     def request(self, method: str, url: str, *, headers: dict[str, str],
                 json: dict[str, Any] | None = None,
                 params: dict[str, Any] | None = None) -> SDKResponse:
@@ -25,7 +28,7 @@ class FixedEndpointTransport:
             raise ValueError("Unexpected transport destination")
         with NoRedirectSession() as session, session.request(
                 method, url, headers=headers, json=json, params=params,
-                timeout=30, allow_redirects=False, stream=True) as response:
+                timeout=self.timeout, allow_redirects=False, stream=True) as response:
             # Non-success payloads are unnecessary for this plugin's fixed outcome.
             data = None
             if response.status_code in (200, 202):
@@ -87,7 +90,7 @@ def send(settings: Settings, message: Message, *, validation: bool = False) -> d
     try:
         client = Client(api_key=settings.api_key.get_secret_value(),
                         base_url="https://api.mailchannels.net/tx/v1",
-                        http_client=FixedEndpointTransport(), strict_responses=True)
+                        http_client=FixedEndpointTransport(timeout=30), strict_responses=True)
         result = client.emails.send(payload, dry_run=dry_run)
     except (MailChannelsError, RequestException, ValueError):
         return {"status": "unknown", "dry_run": dry_run, "retry_safe": False,

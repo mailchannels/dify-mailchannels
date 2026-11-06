@@ -6,7 +6,7 @@ name: mailchannels
 label:
   en_US: MailChannels Email API
 description:
-  en_US: Send or validate transactional email through MailChannels.
+  en_US: 'Send Dify email reliably through MailChannels: delivery tracking, bounce handling and domain authentication built in. Free to start.'
 icon: icon.svg
 created_at: '2026-10-06T02:00:00Z'
 resource:

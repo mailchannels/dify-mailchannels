@@ -4,7 +4,7 @@ identity:
   label:
     en_US: MailChannels Email API
   description:
-    en_US: Transactional email with provider-configured permissions.
+    en_US: Send your Dify app's email through MailChannels Email API, with a configured sender, recipient allowlist and mode.
   icon: icon.svg
   tags:
   - productivity

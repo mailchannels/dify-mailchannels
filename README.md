@@ -1,10 +1,16 @@
 # MailChannels Email API for Dify
 
-A tool plugin for transactional email in workflows and agents. Installation, provider credentials and workflow execution have been tested on local Dify 1.17.1 with a synthetic HTTPS MailChannels mock. Editing and running an existing workflow through the browser also passed. Native Community Edition role, credential visibility/use and workspace switching checks also passed. From-scratch editor authoring, model-driven Agent, Cloud/Enterprise permissions, real provider validation and Marketplace review remain outstanding.
+Send Dify email reliably through MailChannels: delivery tracking, bounce handling and domain authentication built in. Free to start.
+
+MailChannels sends your Dify app's email, such as notifications, alerts, reports and replies from your workflows and agents, through the MailChannels Email API, so it reaches the inbox. Connect with an API key, verify your domain, and every message is tracked: you can see deliveries, bounces and complaints through MailChannels, and bounced addresses are suppressed automatically. MailChannels has delivered email for web hosting providers for twenty years. Start free with 100 emails a day, then pay one simple price per send.
+
+## How it works
+
+This tool plugin adds **Send or validate email** to Dify workflows and agents. Installation, provider credentials and workflow execution have been tested on local Dify 1.17.1 with a synthetic HTTPS MailChannels mock. Editing and running an existing workflow through the browser also passed. Native Community Edition role, credential visibility/use and workspace switching checks also passed. From-scratch editor authoring, model-driven Agent, Cloud/Enterprise permissions and real provider validation remain outstanding.
 
 Configure a MailChannels API key, authorized sender, comma-separated exact recipient allowlist (up to 100 addresses), and mode. Default mode validates without sending. Saving credentials always calls `/send?dry-run=true` with a synthetic message from/to the configured sender, even in send mode. This transmits the sender to MailChannels and checks the key and sender without requesting delivery.
 
-Use **Send or validate email** with a recipient, subject, plain-text body and optional HTML. Only provider configuration can change key, sender, recipient permissions and mode. Use separate configurations for separate tenants. Configure Domain Lockdown/DKIM as documented at https://docs.mailchannels.com/email-api/overview. MailChannels requires an account and has separate service charges.
+Use **Send or validate email** with a recipient, subject, plain-text body and optional HTML. Only provider configuration can change key, sender, recipient permissions and mode. Use separate configurations for separate tenants. Configure Domain Lockdown/DKIM as documented at https://docs.mailchannels.com/email-api/overview. MailChannels requires an account; sending is billed by MailChannels, separately from Dify.
 
 Results: `validated`, `accepted`, `failed`, `rejected` or `unknown`. Accepted is provider handoff, not inbox delivery. No automatic retries are configured. Workflow retry, agent repetition or resumed execution can send twice: this plugin has no durable idempotency. Reconcile unknown outcomes before retrying and enforce application approval/authorization before sending. Attachments, arbitrary headers, custom endpoints and URL downloads are not exposed.
 
@@ -20,7 +26,7 @@ This project is supported by the MailChannels team on a best-effort basis. The b
 
 If you are a MailChannels customer and have a problem with the operation of the MailChannels service, you can get support at https://support.mailchannels.com/
 
-With the official `dify` CLI on PATH, run `python scripts/package.py --output /tmp/mailchannels-0.1.1.difypkg`. The script stages only runtime files. For project support, see the [Support](#support) section. The proposed `mailchannels` Marketplace publisher namespace still needs company registration/ownership; no Marketplace submission has occurred. The manifest declares Dify 1.17.1 as the oldest tested supported version. Older versions have not been validated.
+With the official `dify` CLI on PATH, run `python scripts/package.py --output /tmp/mailchannels-0.1.1.difypkg`. The script stages only runtime files. For project support, see the [Support](#support) section. The plugin is published on the Dify Marketplace as `mailchannels/mailchannels`; a new version reaches the Marketplace only through a pull request to [langgenius/dify-plugins](https://github.com/langgenius/dify-plugins) after it is released here. The manifest declares Dify 1.17.1 as the oldest tested supported version. Older versions have not been validated.
 
 The archive also has serverless-runtime protocol tests. They extract the package into a temporary directory, start its actual entrypoint and provider/tool registration, and call the Dify SDK HTTP runtime. Test-only HTTP interception supplies synthetic MailChannels responses. Run with external networking disabled:
 

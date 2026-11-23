@@ -2,11 +2,18 @@
 from typing import Any
 
 import json as json_module
+import re
+from pathlib import Path
 
 from mailchannels import Client, MailChannelsError
 from mailchannels.response import SDKResponse
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr
 from requests import RequestException, Session
+
+
+# The plugin release from manifest.yaml, named before the SDK's own token for usage reporting.
+PLUGIN_VERSION = re.search(r"^version:\s*(\S+)", Path(__file__).with_name("manifest.yaml").read_text(), re.M).group(1)
+USER_AGENT = f"mailchannels-dify/{PLUGIN_VERSION}"
 
 
 class NoRedirectSession(Session):
@@ -26,6 +33,7 @@ class FixedEndpointTransport:
                 params: dict[str, Any] | None = None) -> SDKResponse:
         if method.upper() != "POST" or url != "https://api.mailchannels.net/tx/v1/send":
             raise ValueError("Unexpected transport destination")
+        headers = {**headers, "User-Agent": f"{USER_AGENT} {headers.get('User-Agent', '')}".strip()}
         with NoRedirectSession() as session, session.request(
                 method, url, headers=headers, json=json, params=params,
                 timeout=self.timeout, allow_redirects=False, stream=True) as response:

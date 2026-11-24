@@ -8,6 +8,9 @@ label:
 description:
   en_US: Send or validate transactional email through MailChannels.
 icon: icon.svg
+tags:
+- business
+- productivity
 created_at: '2026-10-06T02:00:00Z'
 resource:
   memory: 268435456

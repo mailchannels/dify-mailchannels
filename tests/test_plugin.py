@@ -37,6 +37,8 @@ def test_dry_run():
     req=responses.calls[0].request
     assert req.url==URL+'?dry-run=true'
     assert req.headers['X-Api-Key']==KEY
+    import mailchannels.version
+    assert req.headers['User-Agent']=='mailchannels-dify/0.1.2 mailchannels-python/'+mailchannels.version.get_version()
     body=json.loads(req.body)
     assert body['from']['email']==CREDS['sender']
     assert body['personalizations'][0]['to'][0]['email']==INPUT['to']

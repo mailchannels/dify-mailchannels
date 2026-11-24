@@ -10,4 +10,4 @@ For project support, see the [Support section in the README](README.md#support).
 
 Credential removal: uninstalling a tool plugin does not necessarily delete its saved Dify credentials. On tested Dify 1.17.1, remove credentials explicitly in provider settings before uninstalling. See README.md for the verified sequence. This removes Dify's stored credential; it does not revoke the upstream MailChannels API key.
 
-Candidate 0.1.1 rejects redirects before forwarding credentials or content to another destination. Successful response bodies have a 2 MiB local cap; other response bodies are discarded.
+Candidate 0.1.2 rejects redirects before forwarding credentials or content to another destination. Successful response bodies have a 2 MiB local cap; other response bodies are discarded.
